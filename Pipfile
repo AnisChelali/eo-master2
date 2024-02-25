@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+tqdm = "*"
+torch = "*"
+torchvision = "*"
+gdal = "3.4.1"
+scikit-learn = "*"
+matplotlib = "*"
+pandas = "*"
+tensorboard = "*"
+
+[dev-packages]
+torch-tb-profiler = "*"
+ipykernel = "*"
+
+[requires]
+python_version = "3.10"
