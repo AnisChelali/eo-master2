@@ -4,18 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-numpy = "*"
-tqdm = "*"
-torch = "*"
-torchvision = "*"
-#gdal="*"
-scikit-learn = "*"
-matplotlib = "*"
-pandas = "*"
-tensorboard = "*"
+numpy = "1.26.4"
+tqdm = "4.66.2"
+# gdal = {version = "==3.4.1", sys_platform = "== 'linux'"}
+gdal = {file = "GDAL-3.8.4-cp312-cp312-win_amd64.whl", sys_platform = "== 'win32'"}
+scikit-learn = "1.4.1.post1"
+matplotlib = "3.8.3"
+pandas = "2.2.1"
 
 [dev-packages]
-torch-tb-profiler = "*"
 ipykernel = "*"
 
 [requires]

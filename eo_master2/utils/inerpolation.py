@@ -6,7 +6,7 @@ from tqdm import tqdm
 from osgeo import gdal, ogr
 
 
-from eo_landcover.utils import tools
+from eo_master2.utils import tools
 
 
 def interpolate(x, xt, yt):
