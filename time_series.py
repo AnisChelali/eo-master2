@@ -4,9 +4,9 @@ import pandas as pd
 from collections import Counter
 from eo_master2.utils import tools
 
-sits_folder = "C:/Users/Anis Speiler/Desktop/Nouveau dossier (3)/T31TCJ_Toulouse_Nord"
-path_classes = "C:/Users/Anis Speiler/Desktop/Nouveau dossier (3)/T31TCJ_Toulouse_Nord_Classe.tif"
-path_conf = "C:/Users/Anis Speiler/Desktop/Nouveau dossier (3)/T31TCJ_Toulouse_Nord_Confidence.tif"
+sits_folder = "G:/Memoire/data/interpolated/T31TCJ_Toulouse_Nord"
+path_classes = "G:/Memoire/T31TCJ_Toulouse_Nord_Classe.tif"
+path_conf = "G:/Memoire/T31TCJ_Toulouse_Nord_Confidence.tif"
 
 list_images = tools.readFiles(sits_folder, ".tif")
 list_images = sorted(list_images, key=lambda x: int(os.path.basename(x).split(".")[0]))
