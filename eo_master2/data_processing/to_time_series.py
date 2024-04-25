@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from collections import Counter
-from eo_master2.utils import tools
+from . import tools
 
 sits_folder = "G:/Memoire/data/interpolated/T31TCJ_Toulouse_Nord"
 path_classes = "G:/Memoire/T31TCJ_Toulouse_Nord_Classe.tif"
@@ -53,5 +53,5 @@ for c in classes:
 timeSeries = np.vstack(timeSeries)
 labels = np.array(labels)
 
-np.save('time_series', { 'labels' : labels , "timeSeries" : timeSeries })    
+np.save('../data/time_seriess', { 'labels' : labels , "timeSeries" : timeSeries })    
 

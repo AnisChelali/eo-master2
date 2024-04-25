@@ -1,0 +1,339 @@
+{
+    "Level1": {
+        "Urbain": {
+            "code": 100,
+            "alias": "Urbain",
+            "color": "#b106b1",
+            "RGB color": [
+                177,
+                6,
+                177
+            ]
+        },
+        "Cultures annuelles": {
+            "code": 110,
+            "alias": "CultAnnuel",
+            "color": "#ffcb7f",
+            "RGB color": [
+                255,
+                203,
+                127
+            ]
+        },
+        "Cultures pérennes": {
+            "code": 120,
+            "alias": "Perennes",
+            "color": "#aaaa00",
+            "RGB color": [
+                170,
+                170,
+                0
+            ]
+        },
+        "Forêts": {
+            "code": 130,
+            "alias": "Foret",
+            "color": "#009c00",
+            "RGB color": [
+                0,
+                156,
+                0
+            ]
+        },
+        "Formations naturelles basses": {
+            "code": 140,
+            "alias": "Naturel",
+            "color": "#aaff00",
+            "RGB color": [
+                170,
+                255,
+                0
+            ]
+        },
+        "Surfaces minérales": {
+            "code": 150,
+            "alias": "SurfMin",
+            "color": "#ff0000",
+            "RGB color": [
+                255,
+                0,
+                0
+            ]
+        },
+        "Glaciers et neiges éternelles": {
+            "code": 160,
+            "alias": "GlaceNeige",
+            "color": "#bebebe",
+            "RGB color": [
+                190,
+                190,
+                190
+            ]
+        },
+        "Eau": {
+            "code": 170,
+            "alias": "Eau",
+            "color": "#0000ff",
+            "RGB color": [
+                0,
+                0,
+                255
+            ]
+        }
+    },
+    "Level2": {
+        "Urbain dense": {
+            "code": 1,
+            "alias": "UrbainDens",
+            "color": "#ff00ff",
+            "parent": 100,
+            "RGB color": [
+                255,
+                0,
+                255
+            ]
+        },
+        "Urbain diffus": {
+            "code": 2,
+            "alias": "UrbainDiff",
+            "color": "#ff55ff",
+            "parent": 100,
+            "RGB color": [
+                255,
+                85,
+                255
+            ]
+        },
+        "Zones indus. et comm.": {
+            "code": 3,
+            "alias": "ZoneIndCom",
+            "color": "#ffaaff",
+            "parent": 100,
+            "RGB color": [
+                255,
+                170,
+                255
+            ]
+        },
+        "Routes": {
+            "code": 4,
+            "alias": "Routes",
+            "color": "#00ffff",
+            "parent": 100,
+            "RGB color": [
+                0,
+                255,
+                255
+            ]
+        },
+        "Colza": {
+            "code": 5,
+            "alias": "Colza",
+            "color": "#ffff00",
+            "parent": 110,
+            "RGB color": [
+                255,
+                255,
+                0
+            ]
+        },
+        "Ceréales à paille": {
+            "code": 6,
+            "alias": "CerealPail",
+            "color": "#d0ff00",
+            "parent": 110,
+            "RGB color": [
+                208,
+                255,
+                0
+            ]
+        },
+        "Protéagineux": {
+            "code": 7,
+            "alias": "Proteagine",
+            "color": "#a1d600",
+            "parent": 110,
+            "RGB color": [
+                161,
+                214,
+                0
+            ]
+        },
+        "Soja": {
+            "code": 8,
+            "alias": "Soja",
+            "color": "#ffab44",
+            "parent": 110,
+            "RGB color": [
+                255,
+                171,
+                68
+            ]
+        },
+        "Tournesol": {
+            "code": 9,
+            "alias": "Tournesol",
+            "color": "#d6d600",
+            "parent": 110,
+            "RGB color": [
+                214,
+                214,
+                0
+            ]
+        },
+        "Maïs": {
+            "code": 10,
+            "alias": "Mais",
+            "color": "#ff5500",
+            "parent": 110,
+            "RGB color": [
+                255,
+                85,
+                0
+            ]
+        },
+        "Riz": {
+            "code": 11,
+            "alias": "Riz",
+            "color": "#c5ffff",
+            "parent": 110,
+            "RGB color": [
+                197,
+                255,
+                255
+            ]
+        },
+        "Tubercules/Racines": {
+            "code": 12,
+            "alias": "TuberRacin",
+            "color": "#aaaa61",
+            "parent": 110,
+            "RGB color": [
+                170,
+                170,
+                97
+            ]
+        },
+        "Prairie": {
+            "code": 13,
+            "alias": "Prairie",
+            "color": "#aaaa00",
+            "parent": 120,
+            "RGB color": [
+                170,
+                170,
+                0
+            ]
+        },
+        "Vergers": {
+            "code": 14,
+            "alias": "Vergers",
+            "color": "#aaaaff",
+            "parent": 120,
+            "RGB color": [
+                170,
+                170,
+                255
+            ]
+        },
+        "Vignes": {
+            "code": 15,
+            "alias": "Vignes",
+            "color": "#550000",
+            "parent": 120,
+            "RGB color": [
+                85,
+                0,
+                0
+            ]
+        },
+        "Forêts de feuillus": {
+            "code": 16,
+            "alias": "Feuillus",
+            "color": "#009c00",
+            "parent": 130,
+            "RGB color": [
+                0,
+                156,
+                0
+            ]
+        },
+        "Forêts de conifères": {
+            "code": 17,
+            "alias": "Coniferes",
+            "color": "#003200",
+            "parent": 130,
+            "RGB color": [
+                0,
+                50,
+                0
+            ]
+        },
+        "Pelouse": {
+            "code": 18,
+            "alias": "Pelouse",
+            "color": "#aaff00",
+            "parent": 140,
+            "RGB color": [
+                170,
+                255,
+                0
+            ]
+        },
+        "Landes ligneuses": {
+            "code": 19,
+            "alias": "Landes",
+            "color": "#55aa7f",
+            "parent": 140,
+            "RGB color": [
+                85,
+                170,
+                127
+            ]
+        },
+        "Surfaces minérales": {
+            "code": 20,
+            "alias": "SurfMin",
+            "color": "#ff0000",
+            "parent": 150,
+            "RGB color": [
+                255,
+                0,
+                0
+            ]
+        },
+        "Plages et dunes": {
+            "code": 21,
+            "alias": "PlageDune",
+            "color": "#ffb802",
+            "parent": 150,
+            "RGB color": [
+                255,
+                184,
+                2
+            ]
+        },
+        "Glaciers et neiges éternelles": {
+            "code": 22,
+            "alias": "GlaceNeige",
+            "color": "#bebebe",
+            "parent": 160,
+            "RGB color": [
+                190,
+                190,
+                190
+            ]
+        },
+        "Eau": {
+            "code": 23,
+            "alias": "Eau",
+            "color": "#0000ff",
+            "parent": 170,
+            "RGB color": [
+                0,
+                0,
+                255
+            ]
+        }
+    }
+}
