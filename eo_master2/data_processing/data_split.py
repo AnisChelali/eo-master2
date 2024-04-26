@@ -2,7 +2,7 @@ from sklearn.model_selection import StratifiedKFold
 import numpy as np
 
 # Load the dataset
-dataset = np.load('time_series.npy', allow_pickle=True).item()
+dataset = np.load('././data/time_series.npy', allow_pickle=True).item()
 labels = dataset["labels"]
 time_series = dataset["timeSeries"]
 
@@ -18,5 +18,4 @@ for fold, (train_index, test_index) in enumerate(skf.split(X_flattened, labels),
     y_train, y_test = labels[train_index], labels[test_index]
 
     # Save the train and test splits for each fold
-    np.save(f'train_fold_{fold}.npy', {'X_train': X_train, 'y_train': y_train})
-    np.save(f'test_fold_{fold}.npy', {'X_test': X_test, 'y_test': y_test})
+    np.save(f'././data/train_test_fold_{fold}.npy', {'X_train': X_train, 'y_train': y_train, 'X_test': X_test, 'y_test': y_test})
