@@ -13,7 +13,7 @@ def load_data(filename: str) -> list[np.ndarray]:
     return X_train, y_train, X_test, y_test
 
 
-# Function to train and evaluate the rf classifier
+# Function to train and evaluate the RF classifier
 def train_knn_classifier(
     X_train: np.ndarray, y_train: np.ndarray, output_model_file: str = None
 ) -> RandomForestClassifier:
