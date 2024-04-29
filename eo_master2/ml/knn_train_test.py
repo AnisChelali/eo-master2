@@ -5,12 +5,7 @@ from sklearn.metrics import accuracy_score
 import numpy as np
 import pickle as pkl
 
-
-def load_data(filename: str) -> list[np.ndarray]:
-    data = np.load(filename, allow_pickle=True).item()
-    X_train, y_train = data["X_train"], data["y_train"]
-    X_test, y_test = data["X_test"], data["y_test"]
-    return X_train, y_train, X_test, y_test
+from eo_master2.ml.data_utils import *
 
 
 # Function to train and evaluate the knn classifier
@@ -46,7 +41,10 @@ def evaluate(predicted_labels, groud_truth_labels, output_folder) -> None:
 if __name__ == "__main__":
 
     input_data_folder = "data/"
+    lut_filename = "constants/level2_classes_labels.json"
     output_folder = "results/"
+
+    lut = load_lut(lut_filename)
 
     accuracy_scores = []
     # Loop over each fold and perform training and evaluation
@@ -56,8 +54,20 @@ if __name__ == "__main__":
         os.makedirs(split_output_folder, exist_ok=True)
 
         X_train, y_train, X_test, y_test = load_data(
-            filename=f"{input_data_folder}train_test_fold_{fold}.npy"
+            filename=f"{input_data_folder}train_test_fold_{fold}.npy", lut=lut
         )
+
+        # Data preparation
+        X_train = check_dim_format(X_train, nb_date=182)
+        X_test = check_dim_format(X_test, nb_date=182)
+
+        min_per, max_per = get_percentiles(X_train)
+
+        X_train = normelize(X_train, min_per, max_per)
+        X_test = normelize(X_test, min_per, max_per)
+
+        X_train = X_train.reshape((-1, 182 * 4))
+        X_test = X_test.reshape((-1, 182 * 4))
 
         model = train_knn_classifier(
             X_train=X_train,

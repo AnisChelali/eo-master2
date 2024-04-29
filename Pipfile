@@ -12,6 +12,8 @@ scikit-learn = "1.4.1.post1"
 matplotlib = "3.8.3"
 pandas = "2.2.1"
 # pickle is pre installed in python >= 3.x.x
+torch = "*"
+torchvision = "*"
 
 [dev-packages]
 ipykernel = "*"
