@@ -5,13 +5,7 @@ from typing import Union
 
 class ToTensor(object):
     def __call__(self, time_serie: np.ndarray):
-        # if time_serie.dtype == np.uint8 or time_serie.dtype == np.int8:
-        #     print("uint8")
-        #     time_serie = time_serie / 255.0
-
-        # if time_serie.dtype == np.uint16 or time_serie.dtype == np.int16:
-        #     print("uint16")
-        time_serie = time_serie / float(2**16 - 1)
+        time_serie = time_serie
 
         return torch.from_numpy(time_serie)
 
