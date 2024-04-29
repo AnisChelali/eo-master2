@@ -3,14 +3,9 @@ from typing import Union
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 import numpy as np
-import pickle as pkl
+import pickle
 
-
-def load_data(filename: str) -> list[np.ndarray]:
-    data = np.load(filename, allow_pickle=True).item()
-    X_train, y_train = data["X_train"], data["y_train"]
-    X_test, y_test = data["X_test"], data["y_test"]
-    return X_train, y_train, X_test, y_test
+from eo_master2.ml.data_utils import *
 
 
 # Function to train and evaluate the SVM classifier
@@ -18,7 +13,7 @@ def train_knn_classifier(
     X_train: np.ndarray, y_train: np.ndarray, output_model_file: str = None
 ) -> SVC:
     # Initialize and train
-    svm_classifier = SVC(kernel='rbf')
+    svm_classifier = SVC(kernel="rbf")
     svm_classifier.fit(X_train, y_train)
 
     if not output_model_file is None:
