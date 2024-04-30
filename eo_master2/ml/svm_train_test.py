@@ -3,13 +3,13 @@ from typing import Union
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 import numpy as np
-import pickle
+import pickle as pkl
 
 from eo_master2.ml.data_utils import *
 
 
 # Function to train and evaluate the SVM classifier
-def train_knn_classifier(
+def train_svm_classifier(
     X_train: np.ndarray, y_train: np.ndarray, output_model_file: str = None
 ) -> SVC:
     # Initialize and train
@@ -41,7 +41,10 @@ def evaluate(predicted_labels, groud_truth_labels, output_folder) -> None:
 if __name__ == "__main__":
 
     input_data_folder = "data/"
+    lut_filename = "constants/level2_classes_labels.json"
     output_folder = "results/"
+
+    lut = load_lut(lut_filename)
 
     accuracy_scores = []
     # Loop over each fold and perform training and evaluation
@@ -50,11 +53,26 @@ if __name__ == "__main__":
         split_output_folder = f"{output_folder}split_{fold}/"
         os.makedirs(split_output_folder, exist_ok=True)
 
-        X_train, y_train, X_test, y_test = load_data(
-            filename=f"{input_data_folder}train_test_fold_{fold}.npy"
+        X_train, y_train = load_data(
+            filename=f"{input_data_folder}train_fold_{fold}.npy", lut=lut
+        )
+        X_test, y_test = load_data(
+            filename=f"{input_data_folder}test_fold_{fold}.npy", lut=lut
         )
 
-        model = train_knn_classifier(
+        # Data preparation
+        X_train = check_dim_format(X_train, nb_date=182)
+        X_test = check_dim_format(X_test, nb_date=182)
+
+        min_per, max_per = get_percentiles(X_train)
+
+        X_train = normelize(X_train, min_per, max_per)
+        X_test = normelize(X_test, min_per, max_per)
+
+        X_train = X_train.reshape((-1, 182 * 4))
+        X_test = X_test.reshape((-1, 182 * 4))
+
+        model = train_svm_classifier(
             X_train=X_train,
             y_train=y_train,
             output_model_file=f"{split_output_folder}svm_model.pkl",
@@ -74,4 +92,5 @@ if __name__ == "__main__":
 
     print(f"Mean Accuracy: {mean_accuracy}")
     print(f"Standard Deviation: {std_accuracy}")
+
 
