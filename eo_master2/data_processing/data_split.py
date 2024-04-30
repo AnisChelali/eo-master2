@@ -48,13 +48,13 @@ for fold, (train_index, test_index) in enumerate(
     # Save the train and test splits for each fold
     np.save(
         f"data/train_fold_{fold}.npy",
-        {"X_train": X_train, "y_train": y_train},
+        {"X": X_train, "y": y_train},
     )
     np.save(
         f"data/vald_fold_{fold}.npy",
-        {"X_vald": X_vald, "y_vald": y_vald},
+        {"X": X_vald, "y": y_vald},
     )
     np.save(
         f"data/test_fold_{fold}.npy",
-        {"X_test": X_test, "y_test": y_test},
+        {"X": X_test, "y": y_test},
     )

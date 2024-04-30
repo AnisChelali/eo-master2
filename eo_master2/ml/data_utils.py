@@ -15,16 +15,12 @@ def load_lut(filename: str):
 
 def load_data(filename: str, lut: dict) -> list[np.ndarray]:
     data = np.load(filename, allow_pickle=True).item()
-    X_train, y_train = data["X_train"], data["y_train"]
-    X_test, y_test = data["X_test"], data["y_test"]
+    X, y = data["X"], data["y"]
 
-    y_train = categorize(lut, y_train)
-    y_test = categorize(lut, y_test)
+    y = categorize(lut, y)
     return (
-        X_train.astype(np.float32),
-        y_train.astype(np.float32),
-        X_test.astype(np.float32),
-        y_test.astype(np.float32),
+        X.astype(np.float32),
+        y.astype(np.float32),
     )
 
 

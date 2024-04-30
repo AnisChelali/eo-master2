@@ -53,8 +53,11 @@ if __name__ == "__main__":
         split_output_folder = f"{output_folder}split_{fold}/"
         os.makedirs(split_output_folder, exist_ok=True)
 
-        X_train, y_train, X_test, y_test = load_data(
-            filename=f"{input_data_folder}train_test_fold_{fold}.npy", lut=lut
+        X_train, y_train = load_data(
+            filename=f"{input_data_folder}train_fold_{fold}.npy", lut=lut
+        )
+        X_test, y_test = load_data(
+            filename=f"{input_data_folder}test_fold_{fold}.npy", lut=lut
         )
 
         # Data preparation
