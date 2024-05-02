@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    fold = 1 
+    fold = 1
     lut_filename = "constants/level2_classes_labels.json"
     split_output_folder_train = f"data/train_fold_{fold}.npy"
     split_output_folder_vald = f"data/vald_fold_{fold}.npy"
@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     X_train, y_train = load_data(split_output_folder_train, lut)
     X_vald, y_vald = load_data(split_output_folder_vald, lut)
-  
+
     X = check_dim_format(X_train)
     min_percentile, max_percentile = get_percentiles(X)
     print(min_percentile)
@@ -224,10 +224,19 @@ if __name__ == "__main__":
             print("Early stopping triggered.")
             break
 
-    plt.figure(figsize=(10, 7))
+    plt.figure()
     plt.plot(trainning_losses, label="Train loss")
     plt.plot(validation_losses, label="Vald loss")
+    plt.axvline(
+        x=len(validation_losses) - early_stopping_patience,
+        color="red",
+        label="Early stopping",
+    )
+    plt.title("Courbes de pertes")
+    plt.xlabel("Epoch")
+    plt.ylabel("Erreur")
     plt.legend()
+    plt.grid(True)
     plt.tight_layout()
     plt.savefig(curve_output)
     del train_loader, validation_loader, X_train, y_train, X_vald, y_vald
@@ -243,7 +252,7 @@ if __name__ == "__main__":
 
     groud_truth = []
     predictions = []
-    for batch in validation_loader:
+    for batch in test_loader:
         time_series, labels = batch[0].to(device), batch[1].to(device)
 
         predicted = temp_cnn(time_series)
