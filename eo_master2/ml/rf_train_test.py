@@ -6,6 +6,7 @@ import numpy as np
 import pickle as pkl
 
 from eo_master2.ml.data_utils import *
+from eo_master2.evaluation import save_confusion_matrix, cross_scoring
 
 
 # Function to train and evaluate the RF classifier
@@ -24,31 +25,20 @@ def train_rf_classifier(
     return rf_classifier
 
 
-def test_model(model: RandomForestClassifier, test_test: Union[list, np.ndarray]):
-    # Predict and evaluate
-    y_pred = model.predict(test_test)
-
-    return y_pred
-
-
-def evaluate(predicted_labels, groud_truth_labels, output_folder) -> None:
-
-    accuracy = accuracy_score(predicted_labels, groud_truth_labels)
-
-    return accuracy
-
-
 if __name__ == "__main__":
 
     input_data_folder = "data/"
     lut_filename = "constants/level2_classes_labels.json"
     output_folder = "results/"
+    cross_csv_output = "results/RandomForestClassifier.xlsx"
 
     lut = load_lut(lut_filename)
+    class_labels = [i["name"] for i in lut.values()]
 
-    accuracy_scores = []
+    filenames = []
     # Loop over each fold and perform training and evaluation
     for fold in range(1, 6):
+        csv_output = f"results/split_{fold}/rf_scores.xlsx"
 
         split_output_folder = f"{output_folder}split_{fold}/"
         os.makedirs(split_output_folder, exist_ok=True)
@@ -79,17 +69,8 @@ if __name__ == "__main__":
         )
 
         y_predicted = test_model(model=model, test_test=X_test)
-        accuracy = evaluate(
-            predicted_labels=y_predicted,
-            groud_truth_labels=y_test,
-            output_folder=split_output_folder,
-        )
 
-        accuracy_scores.append(accuracy)
+        save_confusion_matrix(y_test, y_predicted, class_labels, csv_output)
+        filenames.append(csv_output)
 
-    mean_accuracy = np.mean(accuracy_scores)
-    std_accuracy = np.std(accuracy_scores)
-
-    print(f"Mean Accuracy: {mean_accuracy}")
-    print(f"Standard Deviation: {std_accuracy}")
-
+    cross_scoring(filenames, class_labels, 5, cross_csv_output)

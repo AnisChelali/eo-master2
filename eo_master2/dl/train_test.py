@@ -1,10 +1,10 @@
+import os
 from typing import List, Union, Optional
 import numpy as np
 import torch
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose
-from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 
 from eo_master2.ml.data_utils import (
@@ -16,6 +16,7 @@ from eo_master2.ml.data_utils import (
 from eo_master2.dl.data_utils import ToTensor, Norm_percentile
 from eo_master2.dl.dataloader import TemporalPixs
 from eo_master2.dl.tempcnn import TempCNN
+from eo_master2.evaluation import save_confusion_matrix, cross_scoring
 
 
 class EarlyStopping:
@@ -108,159 +109,166 @@ class EarlyStopping:
 if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    fold = 1
     lut_filename = "constants/level2_classes_labels.json"
-    split_output_folder_train = f"data/train_fold_{fold}.npy"
-    split_output_folder_vald = f"data/vald_fold_{fold}.npy"
-    split_output_folder_test = f"data/test_fold_{fold}.npy"
-    lut_filename = "constants/level2_classes_labels.json"
-    model_output = f"results/split_{fold}/tempcnn.pt"
-    curve_output = f"results/split_{fold}/tempcnn_train.png"
-    batch_size = 128
-    nb_epochs = 10000
-    learning_rate = 1e-4
-    early_stopping_patience = 10
-
-    # TempCNN parameters
-    sequence_length = 182  # time series length
-    input_dim = 4
-    kernel_size = 11
-    hidden_dims = 128
-    dropout = 0.3
-    ###############################################""
-
-    # Initialize EarlyStopping
-    early_stopping = EarlyStopping(
-        patience=early_stopping_patience,
-        verbose=True,
-        path=model_output,
-    )
+    cross_csv_output = f"results/tempcnn.xlsx"
 
     lut = load_lut(lut_filename)
+    class_labels = [i["name"] for i in lut.values()]
 
-    X_train, y_train = load_data(split_output_folder_train, lut)
-    X_vald, y_vald = load_data(split_output_folder_vald, lut)
+    nb_folds = 5
+    filenames = []
+    for fold in range(1, nb_folds + 1):
+        split_output_folder_train = f"data/train_fold_{fold}.npy"
+        split_output_folder_vald = f"data/vald_fold_{fold}.npy"
+        split_output_folder_test = f"data/test_fold_{fold}.npy"
+        model_output = f"results/split_{fold}/tempcnn.pt"
+        curve_output = f"results/split_{fold}/tempcnn_train.png"
+        csv_output = f"results/split_{fold}/tempcnn_scores.xlsx"
+        batch_size = 128
+        nb_epochs = 10000
+        learning_rate = 1e-4
+        early_stopping_patience = 10
 
-    X = check_dim_format(X_train)
-    min_percentile, max_percentile = get_percentiles(X)
-    print(min_percentile)
-    print(max_percentile)
+        # TempCNN parameters
+        sequence_length = 182  # time series length
+        input_dim = 4
+        kernel_size = 11
+        hidden_dims = 128
+        dropout = 0.3
+        ###############################################""
 
-    # min_percentile = [157.0, 179.0, 207.0, 181.0]
-    # max_percentile = [3555.0, 4229.0, 3805.0, 2837.0]
-    transform = Compose(
-        [
-            ToTensor(),
-            # Norm_percentile(
-            #     np.array(min_percentile),
-            #     np.array(max_percentile),
-            # ),
-        ]
-    )
-    train_set = TemporalPixs(X_train, y_train, transform=transform)
-    validation_set = TemporalPixs(X_vald, y_vald, transform=transform)
-
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
-    validation_loader = DataLoader(validation_set, batch_size=batch_size, shuffle=False)
-
-    temp_cnn = TempCNN(
-        input_dim=input_dim,
-        kernel_size=kernel_size,
-        hidden_dims=hidden_dims,
-        num_classes=19,
-        sequence_length=sequence_length,
-    )
-    temp_cnn.to(device)
-
-    # definision des fonctions d'entrainnement
-    criterion = torch.nn.CrossEntropyLoss()
-
-    optimizer = Adam(
-        temp_cnn.parameters(),
-        lr=learning_rate,
-        weight_decay=5.181869707846283e-05,
-        betas=(0.9, 0.999),
-    )
-
-    trainning_losses = []
-    validation_losses = []
-    for i in range(nb_epochs):
-        trainning_loss = 0.0
-        temp_cnn.train()
-        for batch in train_loader:
-            time_series, labels = batch[0].to(torch.float).to(device), batch[1].to(
-                device
-            )
-
-            predicted: torch.Tensor = temp_cnn(time_series)
-
-            loss = criterion(predicted, labels)
-
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-            trainning_loss += loss.item()
-
-        trainning_loss = trainning_loss / len(train_loader)
-        trainning_losses.append(trainning_loss)
-
-        validation_loss = 0.0
-        temp_cnn.eval()
-        for batch in validation_loader:
-            time_series, labels = batch[0].to(device), batch[1].to(device)
-            predicted = temp_cnn(time_series)
-            loss = criterion(predicted, labels)
-            validation_loss += loss.item()
-
-        validation_loss = validation_loss / len(validation_loader)
-        validation_losses.append(validation_loss)
-
-        print(
-            f"Epoch {i}; trainning loss: {trainning_loss}, validation loss: {validation_loss}"
+        # Initialize EarlyStopping
+        early_stopping = EarlyStopping(
+            patience=early_stopping_patience,
+            verbose=True,
+            path=model_output,
         )
-        if early_stopping(validation_loss, temp_cnn):
-            print("Early stopping triggered.")
-            break
 
-    plt.figure()
-    plt.plot(trainning_losses, label="Train loss")
-    plt.plot(validation_losses, label="Vald loss")
-    plt.axvline(
-        x=len(validation_losses) - early_stopping_patience,
-        color="red",
-        label="Early stopping",
-    )
-    plt.title("Courbes de pertes")
-    plt.xlabel("Epoch")
-    plt.ylabel("Erreur")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig(curve_output)
-    del train_loader, validation_loader, X_train, y_train, X_vald, y_vald
-    ##############################################################
-    #                      Testing the model                     #
-    X_test, y_test = load_data(split_output_folder_test, lut)
+        X_train, y_train = load_data(split_output_folder_train, lut)
+        X_vald, y_vald = load_data(split_output_folder_vald, lut)
 
-    test_set = TemporalPixs(X_test, y_test, transform=transform)
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
+        X = check_dim_format(X_train)
+        min_percentile, max_percentile = get_percentiles(X)
+        print(min_percentile)
+        print(max_percentile)
 
-    temp_cnn.load(model_output)
-    temp_cnn.eval()
+        # min_percentile = [157.0, 179.0, 207.0, 181.0]
+        # max_percentile = [3555.0, 4229.0, 3805.0, 2837.0]
+        transform = Compose(
+            [
+                ToTensor(),
+                # Norm_percentile(
+                #     np.array(min_percentile),
+                #     np.array(max_percentile),
+                # ),
+            ]
+        )
+        train_set = TemporalPixs(X_train, y_train, transform=transform)
+        validation_set = TemporalPixs(X_vald, y_vald, transform=transform)
 
-    groud_truth = []
-    predictions = []
-    for batch in test_loader:
-        time_series, labels = batch[0].to(device), batch[1].to(device)
+        train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+        validation_loader = DataLoader(
+            validation_set, batch_size=batch_size, shuffle=False
+        )
 
-        predicted = temp_cnn(time_series)
-        _, predicted = torch.max(predicted.data, 1)
+        temp_cnn = TempCNN(
+            input_dim=input_dim,
+            kernel_size=kernel_size,
+            hidden_dims=hidden_dims,
+            num_classes=19,
+            sequence_length=sequence_length,
+        )
+        temp_cnn.to(device)
 
-        groud_truth.extend(labels.cpu().numpy())
-        predictions.extend(predicted.detach().cpu().numpy())
+        # definision des fonctions d'entrainnement
+        criterion = torch.nn.CrossEntropyLoss()
 
-    accuracy = accuracy_score(predictions, groud_truth)
+        optimizer = Adam(
+            temp_cnn.parameters(),
+            lr=learning_rate,
+            weight_decay=5.181869707846283e-05,
+            betas=(0.9, 0.999),
+        )
 
-    print(f"Accuracy = {accuracy}")
+        trainning_losses = []
+        validation_losses = []
+        for i in range(nb_epochs):
+            trainning_loss = 0.0
+            temp_cnn.train()
+            for batch in train_loader:
+                time_series, labels = batch[0].to(torch.float).to(device), batch[1].to(
+                    device
+                )
+
+                predicted: torch.Tensor = temp_cnn(time_series)
+
+                loss = criterion(predicted, labels)
+
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+                trainning_loss += loss.item()
+
+            trainning_loss = trainning_loss / len(train_loader)
+            trainning_losses.append(trainning_loss)
+
+            validation_loss = 0.0
+            temp_cnn.eval()
+            for batch in validation_loader:
+                time_series, labels = batch[0].to(device), batch[1].to(device)
+                predicted = temp_cnn(time_series)
+                loss = criterion(predicted, labels)
+                validation_loss += loss.item()
+
+            validation_loss = validation_loss / len(validation_loader)
+            validation_losses.append(validation_loss)
+
+            print(
+                f"Epoch {i}; trainning loss: {trainning_loss}, validation loss: {validation_loss}"
+            )
+            if early_stopping(validation_loss, temp_cnn):
+                print("Early stopping triggered.")
+                break
+
+        plt.figure()
+        plt.plot(trainning_losses, label="Train loss")
+        plt.plot(validation_losses, label="Vald loss")
+        plt.axvline(
+            x=len(validation_losses) - early_stopping_patience,
+            color="red",
+            label="Early stopping",
+        )
+        plt.title("Courbes de pertes")
+        plt.xlabel("Epoch")
+        plt.ylabel("Erreur")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig(curve_output)
+        del train_loader, validation_loader, X_train, y_train, X_vald, y_vald
+        ##############################################################
+        #                      Testing the model                     #
+        X_test, y_test = load_data(split_output_folder_test, lut)
+
+        test_set = TemporalPixs(X_test, y_test, transform=transform)
+        test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
+
+        temp_cnn.load(model_output)
+        temp_cnn.eval()
+
+        groud_truth = []
+        predictions = []
+        for batch in test_loader:
+            time_series, labels = batch[0].to(device), batch[1].to(device)
+
+            predicted = temp_cnn(time_series)
+            _, predicted = torch.max(predicted.data, 1)
+
+            groud_truth.extend(labels.cpu().numpy())
+            predictions.extend(predicted.detach().cpu().numpy())
+
+        save_confusion_matrix(groud_truth, predictions, class_labels, csv_output)
+        filenames.append(csv_output)
+
+    cross_scoring(filenames, class_labels, nb_folds, cross_csv_output)
