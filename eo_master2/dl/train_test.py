@@ -235,7 +235,7 @@ if __name__ == "__main__":
     #                      Testing the model                     #
     X_test, y_test = load_data(split_output_folder_test, lut)
 
-    test_set = TemporalPixs(X_vald, y_vald, transform=transform)
+    test_set = TemporalPixs(X_test, y_test, transform=transform)
     test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
 
     temp_cnn.load(model_output)
