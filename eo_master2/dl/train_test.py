@@ -109,11 +109,14 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    fold = 1 
     lut_filename = "constants/level2_classes_labels.json"
-    split_output_folder = "data/train_test_fold_1.npy"
+    split_output_folder_train = f"data/train_fold_{fold}.npy"
+    split_output_folder_vald = f"data/vald_fold_{fold}.npy"
+    split_output_folder_test = f"data/test_fold_{fold}.npy"
     lut_filename = "constants/level2_classes_labels.json"
-    model_output = "results/split_1/tempcnn.pt"
-    curve_output = "results/split_1/tempcnn_train.png"
+    model_output = f"results/split_{fold}/tempcnn.pt"
+    curve_output = f"results/split_{fold}/tempcnn_train.png"
     batch_size = 128
     nb_epochs = 10000
     learning_rate = 1e-4
@@ -136,7 +139,9 @@ if __name__ == "__main__":
 
     lut = load_lut(lut_filename)
 
-    X_train, y_train, X_test, y_test = load_data(split_output_folder, lut)
+    X_train, y_train = load_data(split_output_folder_train, lut)
+    X_vald, y_vald = load_data(split_output_folder_vald, lut)
+  
     X = check_dim_format(X_train)
     min_percentile, max_percentile = get_percentiles(X)
     print(min_percentile)
@@ -154,7 +159,7 @@ if __name__ == "__main__":
         ]
     )
     train_set = TemporalPixs(X_train, y_train, transform=transform)
-    validation_set = TemporalPixs(X_test, y_test, transform=transform)
+    validation_set = TemporalPixs(X_vald, y_vald, transform=transform)
 
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
     validation_loader = DataLoader(validation_set, batch_size=batch_size, shuffle=False)
@@ -225,14 +230,16 @@ if __name__ == "__main__":
     plt.legend()
     plt.tight_layout()
     plt.savefig(curve_output)
-    # del train_loader, validation_loader, X_train, X_test
+    del train_loader, validation_loader, X_train, y_train, X_vald, y_vald
     ##############################################################
     #                      Testing the model                     #
+    X_test, y_test = load_data(split_output_folder_test, lut)
+
+    test_set = TemporalPixs(X_vald, y_vald, transform=transform)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
 
     temp_cnn.load(model_output)
     temp_cnn.eval()
-
-    # test_loader = DataLoader(validation_set, batch_size=batch_size, shuffle=False)
 
     groud_truth = []
     predictions = []
