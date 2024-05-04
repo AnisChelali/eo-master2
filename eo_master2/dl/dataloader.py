@@ -1,8 +1,12 @@
+import os
+from itertools import product
 from typing import Optional, List
 from torchvision.transforms import Compose
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
+from tqdm import tqdm
 
+from eo_master2.tools import readFiles, readImage
 from eo_master2.ml.data_utils import load_data, load_lut
 from eo_master2.dl.data_utils import ToTensor, Norm_percentile
 
@@ -33,6 +37,86 @@ class TemporalPixs(Dataset):
             time_series = self.transform(time_series)
 
         return time_series, int(label)
+
+
+class SITS(Dataset):
+    """
+    Satellite Image Time Series (SITS) Dataset.
+    """
+
+    def __init__(
+        self,
+        dirpath: str,
+        lut_filename: str,
+        classes_img_filename: str = None,
+        sits_extention: str = ".tif",
+        transform: Optional[Compose] = None,
+    ) -> None:
+        self.dirpath = dirpath
+
+        # List of SITS image files
+        self.sits_image_files = readFiles(self.dirpath, extension=sits_extention)
+        self.sits_image_files = sorted(
+            self.sits_image_files, key=lambda x: int(os.path.basename(x).split(".")[0])
+        )
+
+        # load lookUpTable (lut)
+        self.lut = load_lut(lut_filename)
+
+        # Read classes image if path is given
+        self.classes = None
+        if classes_img_filename:
+            self.classes, _, _ = readImage(classes_img_filename)
+            self.classes = self.classes[:, :, 0]
+
+        self.transform = transform
+
+        self._load_sits_images()
+
+        self.rows, self.cols, _, _ = self.sits.shape
+        self.coords = [(x, y) for x, y in product(range(self.rows), range(self.cols))]
+
+    def _load_sits_images(self) -> np.ndarray:
+        """
+        Load all SITS images and transform to a 3D array.
+
+        Returns:
+            ndarray: 3D array of shape [index, Channels, time].
+        """
+        print("Loading SITS...")
+        self.sits = []
+        for image_file in tqdm(self.sits_image_files):
+            img, _, _ = readImage(image_file)
+            self.sits.append(img)
+
+        self.sits = np.stack(self.sits, axis=0)  # [time, rows, cols, channels]
+        self.sits = self.sits.transpose((1, 2, 3, 0))  # [rows, cols, channels, time]
+
+    def __len__(self) -> int:
+        """
+        Get the number of images in the SITS dataset.
+
+        Returns:
+            int: Number of images in the SITS dataset.
+        """
+        return len(self.coords)
+
+    def __getitem__(self, index: int) -> tuple[np.ndarray, int]:
+        x, y = self.coords[index]
+        time_series = self.sits[x, y].astype(np.float64)
+
+        # Apply transformation if specified
+        if self.transform:
+            time_series = self.transform(time_series)
+
+        if not self.classes is None:
+            classe = self.classes[x, y]
+            return time_series, int(self.lut[str(classe)]["index"])
+        else:
+            return time_series
+
+    def get_shape(self):
+        return self.rows, self.cols
 
 
 if __name__ == "__main__":
