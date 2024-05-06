@@ -1,8 +1,14 @@
 from sklearn.model_selection import StratifiedKFold
 import numpy as np
+import pickle as pkl
 
+
+input_file = "data/time_series_1000000.npy"
 # Load the dataset
-dataset = np.load("data/time_series.npy", allow_pickle=True).item()
+# dataset = np.load(input_file, allow_pickle=True)
+with open(input_file, "rb") as f:
+    dataset = pkl.load(f)
+
 labels = dataset["labels"]
 time_series = dataset["timeSeries"]
 
@@ -46,15 +52,11 @@ for fold, (train_index, test_index) in enumerate(
     print("X_test ", X_test.shape, len(y_test) / nb_data)
 
     # Save the train and test splits for each fold
-    np.save(
-        f"data/train_fold_{fold}.npy",
-        {"X": X_train, "y": y_train},
-    )
-    np.save(
-        f"data/vald_fold_{fold}.npy",
-        {"X": X_vald, "y": y_vald},
-    )
-    np.save(
-        f"data/test_fold_{fold}.npy",
-        {"X": X_test, "y": y_test},
-    )
+    with open(f"data/train_fold_{fold}.npy", "wb") as fout:
+        pkl.dump({"X": X_train, "y": y_train}, fout, protocol=4)
+
+    with open(f"data/vald_fold_{fold}.npy", "wb") as fout:
+        pkl.dump({"X": X_vald, "y": y_vald}, fout, protocol=4)
+
+    with open(f"data/test_fold_{fold}.npy", "wb") as fout:
+        pkl.dump({"X": X_test, "y": y_test}, fout, protocol=4)

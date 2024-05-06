@@ -1,3 +1,4 @@
+from collections import Counter
 import os
 from itertools import product
 from typing import Optional, List
@@ -37,6 +38,15 @@ class TemporalPixs(Dataset):
             time_series = self.transform(time_series)
 
         return time_series, int(label)
+
+    def get_class_weights(self):
+        class_count = Counter(self.y_train)
+        class_count = dict(class_count.most_common())
+        class_count = np.array([v for (t, v) in class_count.items()])
+        class_count = class_count / class_count.sum()
+        class_count = 1.0 / class_count
+        print("Normalized weights des class : ", class_count)
+        return class_count
 
 
 class SITS(Dataset):

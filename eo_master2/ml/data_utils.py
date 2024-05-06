@@ -1,5 +1,6 @@
 import numpy as np
 import json
+import pickle as pkl
 
 
 def categorize(lut, labels):
@@ -14,7 +15,9 @@ def load_lut(filename: str):
 
 
 def load_data(filename: str, lut: dict) -> list[np.ndarray]:
-    data = np.load(filename, allow_pickle=True).item()
+    # data = np.load(filename, allow_pickle=True).item()
+    with open(filename, "rb") as f:
+        data = pkl.load(f)
     X, y = data["X"], data["y"]
 
     y = categorize(lut, y)

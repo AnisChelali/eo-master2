@@ -45,14 +45,18 @@ if __name__ == "__main__":
     filenames = []
     # Loop over each fold and perform training and evaluation
     for fold in range(1, 6):
+        print("#################################")
+        print(f"#              {fold}           #")
         csv_output = f"results/split_{fold}/svm_scores.xlsx"
 
         split_output_folder = f"{output_folder}split_{fold}/"
         os.makedirs(split_output_folder, exist_ok=True)
 
+        print("load trainset...")
         X_train, y_train = load_data(
             filename=f"{input_data_folder}train_fold_{fold}.npy", lut=lut
         )
+        print("load testset...")
         X_test, y_test = load_data(
             filename=f"{input_data_folder}test_fold_{fold}.npy", lut=lut
         )
@@ -69,12 +73,14 @@ if __name__ == "__main__":
         X_train = X_train.reshape((-1, 182 * 4))
         X_test = X_test.reshape((-1, 182 * 4))
 
+        print("Trainning the model...")
         model = train_svm_classifier(
             X_train=X_train,
             y_train=y_train,
             output_model_file=f"{split_output_folder}svm_model.pkl",
         )
 
+        print("Testing...")
         y_predicted = test_model(model=model, test_test=X_test)
 
         save_confusion_matrix(y_test, y_predicted, class_labels, csv_output)

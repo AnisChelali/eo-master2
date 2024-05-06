@@ -14,7 +14,7 @@ def train_knn_classifier(
     X_train: np.ndarray, y_train: np.ndarray, output_model_file: str = None
 ) -> KNeighborsClassifier:
     # Initialize and train
-    knn = KNeighborsClassifier(n_neighbors=3)
+    knn = KNeighborsClassifier(n_neighbors=5, n_jobs=-2)
     knn.fit(X_train, y_train)
 
     if not output_model_file is None:
@@ -45,17 +45,23 @@ if __name__ == "__main__":
     filenames = []
     # Loop over each fold and perform training and evaluation
     for fold in range(1, 6):
+        print("#################################")
+        print(f"#              {fold}           #")
         csv_output = f"results/split_{fold}/knn_scores.xlsx"
 
         split_output_folder = f"{output_folder}split_{fold}/"
         os.makedirs(split_output_folder, exist_ok=True)
 
+        print("load trainset...")
         X_train, y_train = load_data(
             filename=f"{input_data_folder}train_fold_{fold}.npy", lut=lut
         )
+        print(X_train.shape)
+        print("load testset...")
         X_test, y_test = load_data(
             filename=f"{input_data_folder}test_fold_{fold}.npy", lut=lut
         )
+        print(X_test.shape)
 
         # Data preparation
         X_train = check_dim_format(X_train, nb_date=182)
@@ -69,13 +75,16 @@ if __name__ == "__main__":
         X_train = X_train.reshape((-1, 182 * 4))
         X_test = X_test.reshape((-1, 182 * 4))
 
+        print("Trainning the model...")
         model = train_knn_classifier(
             X_train=X_train,
             y_train=y_train,
             output_model_file=f"{split_output_folder}knn_model.pkl",
         )
 
-        y_predicted = test_model(model=model, test_test=X_test)
+        print("Testing...")
+        y_predicted = model.predict(X_test)
+        # test_model(model=model, test_test=X_test)
 
         save_confusion_matrix(y_test, y_predicted, class_labels, csv_output)
         filenames.append(csv_output)
