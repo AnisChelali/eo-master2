@@ -3,7 +3,7 @@ import numpy as np
 import pickle as pkl
 
 
-input_file = "data/time_series_1000000.npy"
+input_file = "data/time_series_100000.npy"
 # Load the dataset
 # dataset = np.load(input_file, allow_pickle=True)
 with open(input_file, "rb") as f:

@@ -1,4 +1,5 @@
 import os
+import time
 from typing import Union
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
@@ -14,13 +15,18 @@ def train_knn_classifier(
     X_train: np.ndarray, y_train: np.ndarray, output_model_file: str = None
 ) -> KNeighborsClassifier:
     # Initialize and train
+    t1 = time.time()
     knn = KNeighborsClassifier(n_neighbors=5, n_jobs=-2)
     knn.fit(X_train, y_train)
-
+    t2 = time.time()
+    trainning_time = t2 - t1
     if not output_model_file is None:
         print(f"Saving model to: {output_model_file}...")
         with open(output_model_file, "wb") as file:
             pkl.dump(knn, file)
+
+    with open(f"{output_model_file}.txt", "wt") as fout:
+        fout.write(str(trainning_time))
 
     return knn
 
@@ -40,7 +46,7 @@ if __name__ == "__main__":
     cross_csv_output = "results/KNeighborsClassifier.xlsx"
 
     lut = load_lut(lut_filename)
-    class_labels = [i["name"] for i in lut.values()]
+    class_labels = [i["name"] for i in lut["level2"].values()]
 
     filenames = []
     # Loop over each fold and perform training and evaluation

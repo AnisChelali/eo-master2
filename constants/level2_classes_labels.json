@@ -1,211 +1,295 @@
 {
-  "1": {
-    "color": [
-      255,
-      0,
-      255
-    ],
-    "gt": 1,
-    "index": 0,
-    "name": "Urbain dense",
-    "parent": 100
+  "level1": {
+    "100": {
+      "code": 100,
+      "name": "Urbain",
+      "color": [
+        177,
+        6,
+        177
+      ],
+      "index": 0
+    },
+    "110": {
+      "code": 110,
+      "name": "Cultures annuelles",
+      "color": [
+        255,
+        203,
+        127
+      ],
+      "index": 1
+    },
+    "120": {
+      "code": 120,
+      "name": "Cultures pérennes",
+      "color": [
+        170,
+        170,
+        0
+      ],
+      "index": 2
+    },
+    "130": {
+      "code": 130,
+      "name": "Forêts",
+      "color": [
+        0,
+        156,
+        0
+      ],
+      "index": 3
+    },
+    "140": {
+      "code": 140,
+      "name": "Formations naturelles basses",
+      "color": [
+        170,
+        255,
+        0
+      ],
+      "index": 4
+    },
+    "170": {
+      "code": 170,
+      "name": "Eau",
+      "color": [
+        0,
+        0,
+        255
+      ],
+      "index": 5
+    },
+    "150": {
+      "code": 150,
+      "name": "Surfaces minérales",
+      "color": [
+        255,
+        0,
+        0
+      ],
+      "index": 6
+    },
+    "160": {
+      "code": 160,
+      "name": "Glaciers et neiges éternelles",
+      "color": [
+        190,
+        190,
+        190
+      ],
+      "index": 7
+    }
   },
-  "2": {
-    "color": [
-      255,
-      85,
-      255
-    ],
-    "gt": 2,
-    "index": 1,
-    "name": "Urbain diffus",
-    "parent": 100
-  },
-  "3": {
-    "color": [
-      255,
-      170,
-      255
-    ],
-    "gt": 3,
-    "index": 2,
-    "name": "Zones indus. et comm.",
-    "parent": 100
-  },
-  "4": {
-    "color": [
-      0,
-      255,
-      255
-    ],
-    "gt": 4,
-    "index": 3,
-    "name": "Routes",
-    "parent": 100
-  },
-  "5": {
-    "color": [
-      255,
-      255,
-      0
-    ],
-    "gt": 5,
-    "index": 4,
-    "name": "Colza",
-    "parent": 110
-  },
-  "6": {
-    "color": [
-      208,
-      255,
-      0
-    ],
-    "gt": 6,
-    "index": 5,
-    "name": "Cer\u00e9ales \u00e0 paille",
-    "parent": 110
-  },
-  "7": {
-    "color": [
-      161,
-      214,
-      0
-    ],
-    "gt": 7,
-    "index": 6,
-    "name": "Prot\u00e9agineux",
-    "parent": 110
-  },
-  "8": {
-    "color": [
-      255,
-      171,
-      68
-    ],
-    "gt": 8,
-    "index": 7,
-    "name": "Soja",
-    "parent": 110
-  },
-  "9": {
-    "color": [
-      214,
-      214,
-      0
-    ],
-    "gt": 9,
-    "index": 8,
-    "name": "Tournesol",
-    "parent": 110
-  },
-  "10": {
-    "color": [
-      255,
-      85,
-      0
-    ],
-    "gt": 10,
-    "index": 9,
-    "name": "Mais",
-    "parent": 110
-  },
-  "12": {
-    "color": [
-      170,
-      170,
-      97
-    ],
-    "gt": 12,
-    "index": 10,
-    "name": "Tubercules/Racines",
-    "parent": 110
-  },
-  "13": {
-    "color": [
-      170,
-      170,
-      0
-    ],
-    "gt": 13,
-    "index": 11,
-    "name": "Prairie",
-    "parent": 120
-  },
-  "14": {
-    "color": [
-      170,
-      170,
-      255
-    ],
-    "gt": 14,
-    "index": 12,
-    "name": "Vergers",
-    "parent": 120
-  },
-  "15": {
-    "color": [
-      85,
-      0,
-      0
-    ],
-    "gt": 15,
-    "index": 13,
-    "name": "Vignes",
-    "parent": 120
-  },
-  "16": {
-    "color": [
-      0,
-      156,
-      0
-    ],
-    "gt": 16,
-    "index": 14,
-    "name": "For\u00eats de feuillus",
-    "parent": 130
-  },
-  "17": {
-    "color": [
-      0,
-      50,
-      0
-    ],
-    "gt": 17,
-    "index": 15,
-    "name": "For\u00eats de conif\u00e8res",
-    "parent": 130
-  },
-  "19": {
-    "color": [
-      85,
-      170,
-      127
-    ],
-    "gt": 19,
-    "index": 16,
-    "name": "Landes ligneuses",
-    "parent": 140
-  },
-  "23": {
-    "color": [
-      0,
-      0,
-      255
-    ],
-    "gt": 23,
-    "index": 17,
-    "name": "Eau",
-    "parent": 170
-  },
-  "24": {
-    "color": [
-      85,
-      170,
-      255
-    ],
-    "gt": 24,
-    "index": 18,
-    "name": "Serres agricole",
-    "parent": 120
+  "level2": {
+    "1": {
+      "color": [
+        255,
+        0,
+        255
+      ],
+      "gt": 1,
+      "index": 0,
+      "name": "Urbain dense",
+      "parent": 100
+    },
+    "2": {
+      "color": [
+        255,
+        85,
+        255
+      ],
+      "gt": 2,
+      "index": 1,
+      "name": "Urbain diffus",
+      "parent": 100
+    },
+    "3": {
+      "color": [
+        255,
+        170,
+        255
+      ],
+      "gt": 3,
+      "index": 2,
+      "name": "Zones indus. et comm.",
+      "parent": 100
+    },
+    "4": {
+      "color": [
+        0,
+        255,
+        255
+      ],
+      "gt": 4,
+      "index": 3,
+      "name": "Routes",
+      "parent": 100
+    },
+    "5": {
+      "color": [
+        255,
+        255,
+        0
+      ],
+      "gt": 5,
+      "index": 4,
+      "name": "Colza",
+      "parent": 110
+    },
+    "6": {
+      "color": [
+        208,
+        255,
+        0
+      ],
+      "gt": 6,
+      "index": 5,
+      "name": "Cer\u00e9ales \u00e0 paille",
+      "parent": 110
+    },
+    "7": {
+      "color": [
+        161,
+        214,
+        0
+      ],
+      "gt": 7,
+      "index": 6,
+      "name": "Prot\u00e9agineux",
+      "parent": 110
+    },
+    "8": {
+      "color": [
+        255,
+        171,
+        68
+      ],
+      "gt": 8,
+      "index": 7,
+      "name": "Soja",
+      "parent": 110
+    },
+    "9": {
+      "color": [
+        214,
+        214,
+        0
+      ],
+      "gt": 9,
+      "index": 8,
+      "name": "Tournesol",
+      "parent": 110
+    },
+    "10": {
+      "color": [
+        255,
+        85,
+        0
+      ],
+      "gt": 10,
+      "index": 9,
+      "name": "Mais",
+      "parent": 110
+    },
+    "12": {
+      "color": [
+        170,
+        170,
+        97
+      ],
+      "gt": 12,
+      "index": 10,
+      "name": "Tubercules/Racines",
+      "parent": 110
+    },
+    "13": {
+      "color": [
+        170,
+        170,
+        0
+      ],
+      "gt": 13,
+      "index": 11,
+      "name": "Prairie",
+      "parent": 120
+    },
+    "14": {
+      "color": [
+        170,
+        170,
+        255
+      ],
+      "gt": 14,
+      "index": 12,
+      "name": "Vergers",
+      "parent": 120
+    },
+    "15": {
+      "color": [
+        85,
+        0,
+        0
+      ],
+      "gt": 15,
+      "index": 13,
+      "name": "Vignes",
+      "parent": 120
+    },
+    "16": {
+      "color": [
+        0,
+        156,
+        0
+      ],
+      "gt": 16,
+      "index": 14,
+      "name": "For\u00eats de feuillus",
+      "parent": 130
+    },
+    "17": {
+      "color": [
+        0,
+        50,
+        0
+      ],
+      "gt": 17,
+      "index": 15,
+      "name": "For\u00eats de conif\u00e8res",
+      "parent": 130
+    },
+    "19": {
+      "color": [
+        85,
+        170,
+        127
+      ],
+      "gt": 19,
+      "index": 16,
+      "name": "Landes ligneuses",
+      "parent": 140
+    },
+    "23": {
+      "color": [
+        0,
+        0,
+        255
+      ],
+      "gt": 23,
+      "index": 17,
+      "name": "Eau",
+      "parent": 170
+    },
+    "24": {
+      "color": [
+        85,
+        170,
+        255
+      ],
+      "gt": 24,
+      "index": 18,
+      "name": "Serres agricole",
+      "parent": 120
+    }
   }
 }

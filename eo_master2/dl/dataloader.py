@@ -7,7 +7,7 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
-from eo_master2.tools import readFiles, readImage
+from eo_master2.tools import readFiles, readImage, getGeoInformation
 from eo_master2.ml.data_utils import load_data, load_lut
 from eo_master2.dl.data_utils import ToTensor, Norm_percentile
 
@@ -19,6 +19,7 @@ class TemporalPixs(Dataset):
         y_train: np.ndarray,
         nb_date: int = 182,
         transform: Optional[Compose] = None,
+        level: str = "level1",
     ) -> None:
 
         self.X_train = X_train.reshape((-1, 4, nb_date))
@@ -41,7 +42,8 @@ class TemporalPixs(Dataset):
 
     def get_class_weights(self):
         class_count = Counter(self.y_train)
-        class_count = dict(class_count.most_common())
+        class_count = dict(sorted(class_count.items()))
+        print(class_count)
         class_count = np.array([v for (t, v) in class_count.items()])
         class_count = class_count / class_count.sum()
         class_count = 1.0 / class_count
@@ -121,12 +123,16 @@ class SITS(Dataset):
 
         if not self.classes is None:
             classe = self.classes[x, y]
-            return time_series, int(self.lut[str(classe)]["index"])
+            return time_series, int(self.lut["level2"][str(classe)]["index"])
         else:
             return time_series
 
     def get_shape(self):
         return self.rows, self.cols
+
+    def get_geodata(self):
+        geoTransform, projection = getGeoInformation(self.sits_image_files[0])
+        return geoTransform, projection
 
 
 if __name__ == "__main__":

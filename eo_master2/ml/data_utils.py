@@ -3,8 +3,18 @@ import json
 import pickle as pkl
 
 
-def categorize(lut, labels):
-    new_labels = np.array([lut[str(i)]["index"] for i in labels])
+def categorize(lut, labels, level=2):
+    level1 = lut["level1"]
+    level2 = lut["level2"]
+    if level == 2:
+        new_labels = np.array([level2[str(i)]["index"] for i in labels])
+    elif level == 1:
+        new_labels = np.array(
+            [level1[str(level2[str(i)]["parent"])]["index"] for i in labels]
+        )
+        print(new_labels, new_labels.dtype)
+        print(np.unique(new_labels))
+
     return new_labels
 
 

@@ -34,16 +34,20 @@ img_confidence = img_confidence.reshape((-1, 1))
 
 classes = np.unique(img_classes)
 
-nb_samples = 1000000
+nb_samples = 100000
 cord = {}
 for c in classes:
     x = np.argwhere(img_classes == c)
     indexs = np.argsort(img_confidence[x[:, 0]], axis=0).reshape((-1, 1))
 
-    a = x[indexs[:, 0][::-1]][0:nb_samples]
-    b = img_confidence[a[:, 0]]
+    # a = x[indexs[:, 0][::-1]][0:nb_samples]
+    if nb_samples < len(x):
+        rand_idx = np.random.choice(range(len(x)), nb_samples, replace=False)
+    else:
+        rand_idx = np.arange(len(x))
+    b = img_confidence[rand_idx]  # [a[:, 0]]
     print(c, "-->", b.max(), b.min())
-    cord[c] = a
+    cord[c] = x[rand_idx]
 
 timeSeries = []
 labels = []

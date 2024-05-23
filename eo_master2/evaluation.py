@@ -308,7 +308,7 @@ def generate_color_image(image_classes, lut):
     rows, cols = image_classes.shape
     colored_image = np.zeros((rows, cols, 3), dtype=np.uint8)
 
-    for idx, item in lut.items():
+    for idx, item in lut["level2"].items():
         colored_image[image_classes == int(item["index"])] = item["color"]
 
     return colored_image

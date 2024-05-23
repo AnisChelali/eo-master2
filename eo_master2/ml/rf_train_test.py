@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import numpy as np
 import pickle as pkl
+import time
 
 from eo_master2.ml.data_utils import *
 from eo_master2.evaluation import save_confusion_matrix, cross_scoring
@@ -14,13 +15,18 @@ def train_rf_classifier(
     X_train: np.ndarray, y_train: np.ndarray, output_model_file: str = None
 ) -> RandomForestClassifier:
     # Initialize and train
-    rf_classifier = RandomForestClassifier(n_estimators=100, random_state=0)
+    t1 = time.time()
+    rf_classifier = RandomForestClassifier(n_estimators=20, random_state=0, n_jobs=-2)
     rf_classifier.fit(X_train, y_train)
-
+    t2 = time.time()
+    trainning_time = t2 - t1
     if not output_model_file is None:
         print(f"Saving model to: {output_model_file}...")
         with open(output_model_file, "wb") as file:
             pkl.dump(rf_classifier, file)
+
+    with open(f"{output_model_file}.txt", "wt") as fout:
+        fout.write(str(trainning_time))
 
     return rf_classifier
 
@@ -40,7 +46,7 @@ if __name__ == "__main__":
     cross_csv_output = "results/RandomForestClassifier.xlsx"
 
     lut = load_lut(lut_filename)
-    class_labels = [i["name"] for i in lut.values()]
+    class_labels = [i["name"] for i in lut["level2"].values()]
 
     filenames = []
     # Loop over each fold and perform training and evaluation
@@ -85,6 +91,8 @@ if __name__ == "__main__":
         y_predicted = test_model(model=model, test_test=X_test)
 
         save_confusion_matrix(y_test, y_predicted, class_labels, csv_output)
+
+        del model, X_test, y_test, X_train, y_train
         filenames.append(csv_output)
 
     cross_scoring(filenames, class_labels, 5, cross_csv_output)

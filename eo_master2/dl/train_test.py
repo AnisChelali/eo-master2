@@ -1,4 +1,5 @@
 import os
+import time
 from typing import List, Union, Optional
 import numpy as np
 import torch
@@ -110,10 +111,17 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     lut_filename = "constants/level2_classes_labels.json"
-    cross_csv_output = f"results/tempcnn.xlsx"
 
     lut = load_lut(lut_filename)
-    class_labels = [i["name"] for i in lut.values()]
+    class_labels = [i["name"] for i in lut["level2"].values()]
+
+    # TempCNN parameters
+    sequence_length = 182  # time series length
+    input_dim = 4
+    kernel_size = 11
+    hidden_dims = 256
+    dropout = 0.3
+    cross_csv_output = f"results/tempcnn_{kernel_size}_{hidden_dims}.xlsx"
 
     nb_folds = 5
     filenames = []
@@ -123,20 +131,18 @@ if __name__ == "__main__":
         split_output_folder_train = f"data/train_fold_{fold}.npy"
         split_output_folder_vald = f"data/vald_fold_{fold}.npy"
         split_output_folder_test = f"data/test_fold_{fold}.npy"
-        model_output = f"results/split_{fold}/tempcnn.pt"
-        curve_output = f"results/split_{fold}/tempcnn_train.png"
-        csv_output = f"results/split_{fold}/tempcnn_scores.xlsx"
+        model_output = f"results/split_{fold}/tempcnn_{kernel_size}_{hidden_dims}.pt"
+        curve_output = (
+            f"results/split_{fold}/tempcnn_{kernel_size}_{hidden_dims}_train.png"
+        )
+        csv_output = (
+            f"results/split_{fold}/tempcnn_scores_{kernel_size}_{hidden_dims}.xlsx"
+        )
         batch_size = 1024
         nb_epochs = 10000
         learning_rate = 1e-4
         early_stopping_patience = 10
 
-        # TempCNN parameters
-        sequence_length = 182  # time series length
-        input_dim = 4
-        kernel_size = 11
-        hidden_dims = 128
-        dropout = 0.3
         ###############################################""
 
         # Initialize EarlyStopping
@@ -146,8 +152,8 @@ if __name__ == "__main__":
             path=model_output,
         )
 
-        # X_train, y_train = load_data(split_output_folder_train, lut)
-        # X_vald, y_vald = load_data(split_output_folder_vald, lut)
+        X_train, y_train = load_data(split_output_folder_train, lut)
+        X_vald, y_vald = load_data(split_output_folder_vald, lut)
 
         # X = check_dim_format(X_train)
         # min_percentile, max_percentile = get_percentiles(X)
@@ -165,121 +171,127 @@ if __name__ == "__main__":
                 # ),
             ]
         )
-        # print("Loading train set")
-        # train_set = TemporalPixs(X_train, y_train, transform=transform)
-        # print("Loading validationn set")
-        # validation_set = TemporalPixs(X_vald, y_vald, transform=transform)
-        # class_weights = train_set.get_class_weights()
+        print("Loading train set")
+        train_set = TemporalPixs(X_train, y_train, transform=transform)
+        print("Loading validationn set")
+        validation_set = TemporalPixs(X_vald, y_vald, transform=transform)
+        class_weights = train_set.get_class_weights()
 
-        # train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
-        # validation_loader = DataLoader(
-        #     validation_set, batch_size=batch_size, shuffle=False
-        # )
+        train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+        validation_loader = DataLoader(
+            validation_set, batch_size=batch_size, shuffle=False
+        )
 
-        # temp_cnn = TempCNN(
-        #     input_dim=input_dim,
-        #     kernel_size=kernel_size,
-        #     hidden_dims=hidden_dims,
-        #     num_classes=19,
-        #     sequence_length=sequence_length,
-        # )
-        # temp_cnn.to(device)
+        temp_cnn = TempCNN(
+            input_dim=input_dim,
+            kernel_size=kernel_size,
+            hidden_dims=hidden_dims,
+            num_classes=len(class_weights),
+            sequence_length=sequence_length,
+        )
+        temp_cnn.to(device)
 
-        # # definision des fonctions d'entrainnement
-        # criterion = torch.nn.CrossEntropyLoss(
-        #     torch.FloatTensor(class_weights).to(device)
-        # )
+        # definision des fonctions d'entrainnement
+        criterion = torch.nn.CrossEntropyLoss(
+            torch.FloatTensor(class_weights).to(device)
+        )
 
-        # optimizer = Adam(
-        #     temp_cnn.parameters(),
-        #     lr=learning_rate,
-        #     weight_decay=5.181869707846283e-05,
-        #     betas=(0.9, 0.999),
-        # )
+        optimizer = Adam(
+            temp_cnn.parameters(),
+            lr=learning_rate,
+            weight_decay=5.181869707846283e-05,
+            betas=(0.9, 0.999),
+        )
 
-        # print("Trainning...")
-        # trainning_losses = []
-        # validation_losses = []
-        # for i in range(nb_epochs):
-        #     trainning_loss = 0.0
-        #     temp_cnn.train()
-        #     for batch in train_loader:
-        #         time_series, labels = batch[0].to(torch.float).to(device), batch[1].to(
-        #             device
-        #         )
+        print("Trainning...")
+        t1 = time.time()
+        trainning_losses = []
+        validation_losses = []
+        for i in range(nb_epochs):
+            trainning_loss = 0.0
+            temp_cnn.train()
+            for batch in train_loader:
+                time_series, labels = batch[0].to(torch.float).to(device), batch[1].to(
+                    device
+                )
 
-        #         predicted: torch.Tensor = temp_cnn(time_series)
+                predicted: torch.Tensor = temp_cnn(time_series)
 
-        #         loss = criterion(predicted, labels)
+                loss = criterion(predicted, labels)
 
-        #         optimizer.zero_grad()
-        #         loss.backward()
-        #         optimizer.step()
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-        #         trainning_loss += loss.item()
+                trainning_loss += loss.item()
 
-        #     trainning_loss = trainning_loss / len(train_loader)
-        #     trainning_losses.append(trainning_loss)
+            trainning_loss = trainning_loss / len(train_loader)
+            trainning_losses.append(trainning_loss)
 
-        #     validation_loss = 0.0
-        #     temp_cnn.eval()
-        #     for batch in validation_loader:
-        #         time_series, labels = batch[0].to(device), batch[1].to(device)
-        #         predicted = temp_cnn(time_series)
-        #         loss = criterion(predicted, labels)
-        #         validation_loss += loss.item()
+            validation_loss = 0.0
+            temp_cnn.eval()
+            for batch in validation_loader:
+                time_series, labels = batch[0].to(device), batch[1].to(device)
+                predicted = temp_cnn(time_series)
+                loss = criterion(predicted, labels)
+                validation_loss += loss.item()
 
-        #     validation_loss = validation_loss / len(validation_loader)
-        #     validation_losses.append(validation_loss)
+            validation_loss = validation_loss / len(validation_loader)
+            validation_losses.append(validation_loss)
 
-        #     print(
-        #         f"Epoch {i}; trainning loss: {trainning_loss}, validation loss: {validation_loss}"
-        #     )
-        #     if early_stopping(validation_loss, temp_cnn):
-        #         print("Early stopping triggered.")
-        #         break
+            print(
+                f"Epoch {i}; trainning loss: {trainning_loss}, validation loss: {validation_loss}"
+            )
+            if early_stopping(validation_loss, temp_cnn):
+                print("Early stopping triggered.")
+                break
 
-        # plt.figure()
-        # plt.plot(trainning_losses, label="Train loss")
-        # plt.plot(validation_losses, label="Vald loss")
-        # plt.axvline(
-        #     x=len(validation_losses) - early_stopping_patience - 1,
-        #     color="red",
-        #     label="Early stopping",
-        # )
-        # plt.title("Courbes de pertes")
-        # plt.xlabel("Epoch")
-        # plt.ylabel("Erreur")
-        # plt.legend()
-        # plt.grid(True)
-        # plt.tight_layout()
-        # plt.savefig(curve_output)
-        # del train_loader, validation_loader, X_train, y_train, X_vald, y_vald
-        # ##############################################################
-        # #                      Testing the model                     #
-        # print("Loading testset...")
-        # X_test, y_test = load_data(split_output_folder_test, lut)
+        t2 = time.time()
+        trainning_time = t2 - t1
+        with open(f"{model_output}.txt", "wt") as fout:
+            fout.write(str(trainning_time))
 
-        # test_set = TemporalPixs(X_test, y_test, transform=transform)
-        # test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
+        plt.figure()
+        plt.plot(trainning_losses, label="Train loss")
+        plt.plot(validation_losses, label="Vald loss")
+        plt.axvline(
+            x=len(validation_losses) - early_stopping_patience - 1,
+            color="red",
+            label="Early stopping",
+        )
+        plt.title("Courbes de pertes")
+        plt.xlabel("Epoch")
+        plt.ylabel("Erreur")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig(curve_output)
+        del train_loader, validation_loader, X_train, y_train, X_vald, y_vald
+        ##############################################################
+        #                      Testing the model                     #
+        print("Loading testset...")
+        X_test, y_test = load_data(split_output_folder_test, lut)
 
-        # temp_cnn.load(model_output)
-        # temp_cnn.eval()
+        test_set = TemporalPixs(X_test, y_test, transform=transform)
+        test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
 
-        # print("infering...")
-        # groud_truth = []
-        # predictions = []
-        # for batch in test_loader:
-        #     time_series, labels = batch[0].to(device), batch[1].to(device)
+        temp_cnn.load(model_output)
+        temp_cnn.eval()
 
-        #     predicted = temp_cnn(time_series)
-        #     _, predicted = torch.max(predicted.data, 1)
+        print("infering...")
+        groud_truth = []
+        predictions = []
+        for batch in test_loader:
+            time_series, labels = batch[0].to(device), batch[1].to(device)
 
-        #     groud_truth.extend(labels.cpu().numpy())
-        #     predictions.extend(predicted.detach().cpu().numpy())
+            predicted = temp_cnn(time_series)
+            _, predicted = torch.max(predicted.data, 1)
 
-        # save_confusion_matrix(groud_truth, predictions, class_labels, csv_output)
-        # del test_loader, test_set, groud_truth, predictions, temp_cnn
+            groud_truth.extend(labels.cpu().numpy())
+            predictions.extend(predicted.detach().cpu().numpy())
+
+        save_confusion_matrix(groud_truth, predictions, class_labels, csv_output)
+        del test_loader, test_set, groud_truth, predictions, temp_cnn
 
         filenames.append(csv_output)
 

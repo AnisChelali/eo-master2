@@ -18,28 +18,34 @@ from eo_master2 import tools
 if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    lut_filename = "constants/level2_classes_labels.json"
-    dirpath = (
-        "/media/mohamed/Data/TeleDetection/DATA/interpolated/T31TCJ_Toulouse_Nord/"
-    )
-    classes = "/media/mohamed/Data/TeleDetection/DATA/T31TCJ_Toulouse_Nord_Classe.tif"
-    # classes = "/media/mohamed/Data/TeleDetection/DATA/T31TCJ_Toulouse_Sud_Classe.tif"
 
-    output_image = f"results/tempcnn_classification.png"
-    output_xlsx = f"results/tempcnn_classification.xlsx"
+    # region = "T31TCJ_Toulouse_Sud"
+    # region = "T31TCJ_Toulouse_Nord"
+    region = "T31SFA_BBA_BBA"
+    # region = "T31SFA_BBA_Bejaya"
+    lut_filename = "constants/level2_classes_labels.json"
+    dirpath = f"/media/mohamed/Data/TeleDetection/DATA/interpolated/{region}/"
+    classes = f"/media/mohamed/Data/TeleDetection/DATA/{region}_Classe.tif"
+    evaluate = True
+    if not os.path.exists(classes):
+        evaluate = False
+        classes = None
+
+    output_image = f"results/tempcnn_{region}.png"
+    output_xlsx = f"results/tempcnn_{region}.xlsx"
 
     fold = 1
-    model_filename = f"results/split_{fold}/tempcnn.pt"
-    batch_size = 128
+    kernel_size = 11
+    hidden_dims = 256
+    model_filename = f"results/split_{fold}/tempcnn_{kernel_size}_{hidden_dims}.pt"
+    batch_size = 1024
 
     lut = load_lut(lut_filename)
-    class_labels = [i["name"] for i in lut.values()]
+    class_labels = [i["name"] for i in lut["level2"].values()]
 
     # TempCNN parameters
     sequence_length = 182  # time series length
     input_dim = 4
-    kernel_size = 11
-    hidden_dims = 128
     dropout = 0.3
 
     temp_cnn = TempCNN(
@@ -70,25 +76,28 @@ if __name__ == "__main__":
     groud_truth = []
     predictions = []
     for batch in tqdm(test_loader, total=len(test_loader)):
-        time_series, labels = batch[0].to(torch.float).to(device), batch[1].to(device)
+        if evaluate:
+            time_series, labels = batch[0].to(torch.float).to(device), batch[1].to(
+                device
+            )
+        else:
+            time_series = batch.to(torch.float).to(device)
 
         predicted = temp_cnn(time_series)
         _, predicted = torch.max(predicted.data, 1)
 
-        groud_truth.extend(labels.cpu().numpy())
+        if evaluate:
+            groud_truth.extend(labels.cpu().numpy())
         predictions.extend(predicted.detach().cpu().numpy())
 
-    save_confusion_matrix(groud_truth, predictions, class_labels, output_xlsx)
+    if evaluate:
+        save_confusion_matrix(groud_truth, predictions, class_labels, output_xlsx)
 
-    
     predictions = np.array(predictions)
     predictions = predictions.reshape(test_set.get_shape())
 
-    del test_loader, test_set
-
+    geoTransform, projection = test_set.get_geodata()
     colored_image = generate_color_image(predictions, lut)
-
-    geoTransform, projection = tools.getGeoInformation(classes)
     tools.saveImage(
         colored_image, output_image, geoTransform=geoTransform, projection=projection
     )
