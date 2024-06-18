@@ -19,13 +19,13 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # region = "T31TCJ_Toulouse_Sud"
+    region = "T31TCJ_Toulouse_Sud"
     # region = "T31TCJ_Toulouse_Nord"
-    region = "T31SFA_BBA_BBA"
+    # region = "T31SFA_BBA_BBA"
     # region = "T31SFA_BBA_Bejaya"
     lut_filename = "constants/level2_classes_labels.json"
-    dirpath = f"/media/mohamed/Data/TeleDetection/DATA/interpolated/{region}/"
-    classes = f"/media/mohamed/Data/TeleDetection/DATA/{region}_Classe.tif"
+    dirpath = f"C:/Users/Anis Speiler/Desktop/Master2 MEMOIRE/{region}/"
+    classes = f"C:/Users/Anis Speiler/Desktop/Master2 MEMOIRE/{region}_Classe.tif"
     evaluate = True
     if not os.path.exists(classes):
         evaluate = False
