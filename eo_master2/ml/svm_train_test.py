@@ -16,7 +16,7 @@ def train_svm_classifier(
 ) -> SVC:
     # Initialize and train
     t1 = time.time()
-    svm_classifier = SVC(kernel="rbf", max_iter=20)
+    svm_classifier = SVC(kernel="rbf", max_iter=100)
     svm_classifier.fit(X_train, y_train)
     t2 = time.time()
     trainning_time = t2 - t1
