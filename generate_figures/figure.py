@@ -24,3 +24,22 @@ def plot_profiles(sits, gt_image, coords, output_figure):
     plt.savefig(output_figure)
 
 
+ImportWarning
+
+classes = np.unique(img.ravel())
+
+coordinates = {}
+for c in classes:
+    coords = np.argwhere(classes == c)
+    idx = np.random.randint(0, len(coords))
+    coord = coords[idx]
+    coordinates[c] = coord
+
+with open(...) as f:
+    pkl.dump(f, coordinates)
+
+{
+    "code_class": 0,
+    "coordinates": [x, y]
+    "time_series": [....] => 187
+}
