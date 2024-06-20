@@ -23,3 +23,36 @@ html {
     max-height: 200px;
     overflow-y: auto;
 }
+
+
+.legends {
+    position: absolute;
+    top: 216px;
+    right: 20px;
+    z-index: 1000;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.legends p {
+    font-size: 15px;
+    border-bottom: 0.5px solid black;
+    display: inline-block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.legend {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.color-box {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+}

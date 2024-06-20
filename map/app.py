@@ -64,8 +64,8 @@ def zoom(city):
 def overlay_landcover(city):
     landcover = {
         "Toulouse": "Toulouse_landcover.png",
-        "Bejaya": None,
-        "BordjBouArreridj": None,
+        "Bejaya": "Bejaya_landcover.png",
+        "Bordj Bou Arreridj": "BBA_landcover.png",
     }
 
     print(landcover[city])
@@ -98,8 +98,8 @@ def overlay_landcover(city):
 def send_image(city):
     landcover = {
         "Toulouse": "Toulouse_landcover.png",
-        "Bejaya": None,
-        "BordjBouArreridj": None,
+        "Bejaya": "Bejaya_landcover.png",
+        "Bordj Bou Arreridj": "BBA_landcover.png",
     }
     return send_from_directory(
         IMAGE_DIRECTORY, landcover[city]
