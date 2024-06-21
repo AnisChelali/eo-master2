@@ -20,7 +20,7 @@ function zoom(map, latitude, longitude) {
 }
 
 // Function to overlay the image on the map
-function overlayImage(map, city, imagePath, tl_latlong, tr_latlong, bl_latlong, br_latlong) {
+function overlayImage(map, city, imageType, imagePath, tl_latlong, tr_latlong, bl_latlong, br_latlong) {
     // var latLngBounds = L.latLngBounds([top_left_lat, bottom_right_long]);
     console.log("latLngBounds", tl_latlong, tr_latlong, bl_latlong, br_latlong);
 
@@ -28,10 +28,11 @@ function overlayImage(map, city, imagePath, tl_latlong, tr_latlong, bl_latlong, 
     if (imagesOverlay[city]) {
         map.removeLayer(imagesOverlay[city]);
     }
-
+    opacity = imageType === 'landcover'? 0.5 : 0.7 ;
+    console.log('opacity : ', opacity)
     // L.rectangle(latLngBounds, { color: "#ff7800", weight: 1 }).addTo(map);
     var imageOverlay = L.imageOverlay.rotated(imagePath, tl_latlong, tr_latlong, bl_latlong, {
-        opacity: 0.5,
+        opacity: opacity,
         interactive: true,
     }).addTo(map);
 
@@ -59,9 +60,9 @@ function zoom_over_city(map, city) {
 }
 
 
-function get_image(map, city, tl_latlong, tr_latlong, bl_latlong, br_latlong) {
+function get_image(map, city, imageType, tl_latlong, tr_latlong, bl_latlong, br_latlong) {
     $.ajax({
-        url: '/send_image/' + city,
+        url: '/send_image/' + city + '/' + imageType,
         method: 'GET',
         xhrFields: {
             responseType: 'blob' // Set the response type to blob
@@ -71,7 +72,7 @@ function get_image(map, city, tl_latlong, tr_latlong, bl_latlong, br_latlong) {
                 var reader = new FileReader(); // Create a FileReader object
                 reader.onload = function () {
                     var imageUrl = reader.result; // Get the base64 encoded image URL
-                    overlayImage(map, city, imageUrl, tl_latlong, tr_latlong, bl_latlong, br_latlong);
+                    overlayImage(map, city, imageType, imageUrl, tl_latlong, tr_latlong, bl_latlong, br_latlong);
                 };
                 reader.readAsDataURL(response);
             } else {
@@ -86,14 +87,14 @@ function get_image(map, city, tl_latlong, tr_latlong, bl_latlong, br_latlong) {
     });
 }
 
-// Function to fetch geographic information from the server
-function overlay_landcover_city(map, city) {
+
+function overlay_image(map, city, imageType) {
     $.ajax({
-        url: '/overlay_landcover/' + city,
+        url: '/overlay_image/' + city + '/' + imageType,
         method: 'GET',
         success: function (response) {
             if (!response.error) {
-                get_image(map, city, response.tl_latlong, response.tr_latlong, response.bl_latlong, response.br_latlong);
+                get_image(map, city, imageType, response.tl_latlong, response.tr_latlong, response.bl_latlong, response.br_latlong);
             } else {
                 console.log("Response error 2");
                 console.error(response.error);
@@ -106,6 +107,28 @@ function overlay_landcover_city(map, city) {
         }
     });
 }
+
+// Function to fetch geographic information from the server
+// function overlay_landcover_city(map, city, ) {
+//     $.ajax({
+//         url: '/overlay_image/' + city,
+//         method: 'GET',
+//         success: function (response) {
+//             if (!response.error) {
+//                 get_image(map, city, response.tl_latlong, response.tr_latlong, response.bl_latlong, response.br_latlong);
+//             } else {
+//                 console.log("Response error 2");
+//                 console.error(response.error);
+//             }
+//         },
+//         error: function (xhr, status, error) {
+//             console.log("Response error 1");
+
+//             console.error('Error:', error);
+//         }
+//     });
+// }
+
 
 
 
@@ -179,10 +202,9 @@ function getCheckedOverlayData(map, city) {
                 // Output the name of the checked city radio button
                 console.log("checked", this.getAttribute('id'));
                 overlay_data = this.getAttribute('id');
-                if (overlay_data === "landcover") {
-                    console.log("city ", city);
-                    overlay_landcover_city(map, city);
-                }
+
+                console.log("city ", city);
+                overlay_image(map, city, overlay_data);
 
             }
             else {

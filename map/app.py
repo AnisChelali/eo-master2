@@ -60,14 +60,20 @@ def zoom(city):
         return jsonify({"error": "The selected city is not available."})
 
 
-@app.route("/overlay_landcover/<string:city>")
-def overlay_landcover(city):
+@app.route("/overlay_image/<string:city>/<string:imageType>")
+def overlay_image(city, imageType):
     landcover = {
         "Toulouse": "Toulouse_landcover.png",
         "Bejaya": "Bejaya_landcover.png",
         "Bordj Bou Arreridj": "BBA_landcover.png",
     }
 
+    if imageType == "sentinel2":
+        landcover["Toulouse"] = "Toulouse_sentinel.png"
+        landcover["Bejaya"] = "Bejaya_sentinel.png"
+        landcover["Bordj Bou Arreridj"] = "BBA_sentinel.png"
+    
+    print(imageType)
     print(landcover[city])
 
     if not landcover[city] is None:
@@ -90,17 +96,58 @@ def overlay_landcover(city):
         return jsonify(
             {"error": "Failed to read geographic information from the image"}
         )
+    
+
+
+
+
+# @app.route("/overlay_sentinel/<string:city>")
+# def overlay_sentinel(city):
+#     landcover = {
+#         "Toulouse": "Toulouse_sentinel.png",
+#         "Bejaya": "Bejaya_sentinel.png",
+#         "Bordj Bou Arreridj": "BBA_sentinel.png",
+#     }
+
+#     print(landcover[city])
+
+#     if not landcover[city] is None:
+#         print("=============")
+#         tl_latlong, tr_latlong, bl_latlong, br_latlong = tools.getLatitudeLongitude(
+#             f"map/{IMAGE_DIRECTORY}/{landcover[city]}"
+#         )
+#         print(tl_latlong, tr_latlong, bl_latlong, br_latlong)
+#         # print("===> ", send_from_directory(IMAGE_DIRECTORY, landcover[city]))
+#         # Returning the geographic information as JSON
+#         return jsonify(
+#             {
+#                 "tl_latlong": tl_latlong,
+#                 "tr_latlong": tr_latlong,
+#                 "bl_latlong": bl_latlong,
+#                 "br_latlong": br_latlong,
+#             }
+#         )
+#     else:
+#         return jsonify(
+#             {"error": "Failed to read geographic information from the image"}
+#         )
 
     # return send_from_directory(IMAGE_DIRECTORY, filename)
 
 
-@app.route("/send_image/<string:city>")
-def send_image(city):
+@app.route("/send_image/<string:city>/<string:imageType>")
+def send_image(city, imageType):
     landcover = {
         "Toulouse": "Toulouse_landcover.png",
         "Bejaya": "Bejaya_landcover.png",
         "Bordj Bou Arreridj": "BBA_landcover.png",
     }
+    if imageType == "sentinel2":
+        landcover = {
+            "Toulouse" : "Toulouse_sentinel.png",
+            "Bejaya" : "Bejaya_sentinel.png",
+            "Bordj Bou Arreridj" : "BBA_sentinel.png",
+        }
     return send_from_directory(
         IMAGE_DIRECTORY, landcover[city]
     )  # f"{IMAGE_DIRECTORY}/{landcover[city]}")
