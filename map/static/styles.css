@@ -56,3 +56,13 @@ html {
     display: inline-block;
     margin-right: 10px;
 }
+input[type="range"] {
+    position: fixed;
+    top: 50%;
+    left: -13%;
+    transform: rotate(-90deg) translateY(-50%);
+    z-index: 1000;
+    display: none;
+    width: 30%;
+    cursor: pointer;
+}

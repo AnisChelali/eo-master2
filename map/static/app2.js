@@ -5,6 +5,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 var popup = L.popup();
 
+
 // Function to initialize the map with the given geographic transformation
 function zoom(map, latitude, longitude) {
     // Convert latitude and longitude to Leaflet LatLng object
@@ -28,17 +29,27 @@ function overlayImage(map, city, imageType, imagePath, tl_latlong, tr_latlong, b
     if (imagesOverlay[city]) {
         map.removeLayer(imagesOverlay[city]);
     }
-    opacity = imageType === 'landcover'? 0.5 : 0.7 ;
-    console.log('opacity : ', opacity)
+
+    // opacity = imageType === 'landcover'? 0.5 : 0.7 ;
+    // console.log('opacity : ', opacity , opa)
     // L.rectangle(latLngBounds, { color: "#ff7800", weight: 1 }).addTo(map);
-    var imageOverlay = L.imageOverlay.rotated(imagePath, tl_latlong, tr_latlong, bl_latlong, {
-        opacity: opacity,
+    var ImageOverlay = L.imageOverlay.rotated(imagePath, tl_latlong, tr_latlong, bl_latlong, {
+        opacity: 1,
         interactive: true,
     }).addTo(map);
 
-
-    imagesOverlay[city] = imageOverlay;
+    imagesOverlay[city] = ImageOverlay;
+    document.getElementById("varianceRange").style.display = "block"
 }
+
+function updateValue(val) {
+    if(document.getElementsByClassName('leaflet-image-layer')[1]){
+        document.getElementsByClassName('leaflet-image-layer')[1].style.opacity = val
+    }else {
+        console.log('there is no Overlayimage')
+    }
+}
+
 
 // Function to fetch geographic information from the server
 function zoom_over_city(map, city) {
@@ -202,10 +213,8 @@ function getCheckedOverlayData(map, city) {
                 // Output the name of the checked city radio button
                 console.log("checked", this.getAttribute('id'));
                 overlay_data = this.getAttribute('id');
-
                 console.log("city ", city);
                 overlay_image(map, city, overlay_data);
-
             }
             else {
                 console.log("Unchecked", this.getAttribute('id'));
@@ -217,6 +226,8 @@ function getCheckedOverlayData(map, city) {
                     map.removeLayer(imagesOverlay[city]);
                     delete imagesOverlay[city];
                 }
+
+                document.getElementById("varianceRange").style.display = "none"
             }
         });
     }
