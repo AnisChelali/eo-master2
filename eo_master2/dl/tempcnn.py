@@ -3,6 +3,8 @@ Implementation of TempCNN with pytorch.
 This model is proposed by Pelletier et al. 2019 (https://www.mdpi.com/2072-4292/11/5/523)
 
 Original repo: https://github.com/charlotte-pel/temporalCNN
+
+This script is taken from: https://github.com/dl4sits/BreizhCrops/blob/master/breizhcrops/models/TempCNN.py
 """
 
 import os
